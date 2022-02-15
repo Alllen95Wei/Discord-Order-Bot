@@ -15,7 +15,7 @@ mode = "ready"
 current_order = {}
 order_info = ""
 final_msg_type = []
-channel = ""
+channel = []
 
 
 @client.event
@@ -43,12 +43,14 @@ async def on_message(message):
             embed.set_footer(text=time_stamp)
             final_msg.append(embed)
             final_msg_type.append("embed")
+            channel.append(message.channel)
         if msg_in[3:] == "ping":
             embed = discord.Embed(title="延遲", description="{0}ms".format(str(round(client.latency * 1000))),
                                   color=0x14E073)
             embed.set_footer(text=time_stamp)
             final_msg.append(embed)
             final_msg_type.append("embed")
+            channel.append(message.channel)
         if msg_in[3:6] == "add":
             if "busy" not in mode:
                 current_order["author"] = str(message.author)
@@ -66,6 +68,7 @@ async def on_message(message):
                 embed.set_footer(text="輸入n以取消 • " + time_stamp)
                 final_msg.append(embed)
                 final_msg_type.append("embed")
+                channel.append(message.channel)
                 last_num_txt = open("last-num.txt", mode="w", encoding="utf-8")
                 last_num_txt.write(str(num))
                 last_num_txt.close()
@@ -74,6 +77,7 @@ async def on_message(message):
                 embed.set_footer(text=time_stamp)
                 final_msg.append(embed)
                 final_msg_type.append("embed")
+                channel.append(message.channel)
         if msg_in[3:7] == "edit":
             if "busy" not in mode:
                 current_order["author"] = str(message.author)
@@ -84,11 +88,13 @@ async def on_message(message):
                 embed.set_footer(text="輸入n以取消 • " + time_stamp)
                 final_msg.append(embed)
                 final_msg_type.append("embed")
+                channel.append(message.channel)
             else:
                 embed = discord.Embed(title="錯誤：編輯訂單", description="目前系統忙碌中，請稍後再試。", color=0xf21c1c)
                 embed.set_footer(text=time_stamp)
                 final_msg.append(embed)
                 final_msg_type.append("embed")
+                channel.append(message.channel)
     elif "busy" in mode:
         if current_order["author"] == str(message.author):
             use_log = str(message.channel) + "/" + str(message.author) + ":\n" + msg_in + "\n\n"
@@ -100,6 +106,7 @@ async def on_message(message):
                 embed.set_footer(text=time_stamp)
                 final_msg.append(embed)
                 final_msg_type.append("embed")
+                channel.append(message.channel)
                 mode = "ready"
                 current_order = {}
             elif mode == "busy-1":
@@ -110,11 +117,13 @@ async def on_message(message):
                     embed.set_footer(text=time_stamp)
                     final_msg.append(embed)
                     final_msg_type.append("embed")
+                    channel.append(message.channel)
                 else:
                     embed = discord.Embed(title="錯誤：新增訂單", description="請輸入**要求商品的URL(連結)**。", color=0xf21c1c)
                     embed.set_footer(text=time_stamp)
                     final_msg.append(embed)
                     final_msg_type.append("embed")
+                    channel.append(message.channel)
             elif mode == "busy-2":
                 if msg_in.isdigit():
                     mode = "busy-3"
@@ -123,6 +132,7 @@ async def on_message(message):
                     embed.set_footer(text=time_stamp)
                     final_msg.append(embed)
                     final_msg_type.append("embed")
+                    channel.append(message.channel)
                     embed = discord.Embed(title="訂單內容：`{0}`".format(str(current_order["order_num"])),
                                           description="商品網址：{0}\n商品數量：{1}".format(
                                               str(current_order["url"]), str(current_order["amount"])),
@@ -130,15 +140,18 @@ async def on_message(message):
                     embed.set_footer(text=time_stamp)
                     final_msg.append(embed)
                     final_msg_type.append("embed")
+                    channel.append(message.channel)
                     embed = discord.Embed(title="確認訂單", description="請輸入`y`表示**確認**。或是輸入`n`，以**取消**這次訂單。",
                                           color=0x14E073)
                     final_msg.append(embed)
                     final_msg_type.append("embed")
+                    channel.append(message.channel)
                 else:
                     embed = discord.Embed(title="錯誤：新增訂單", description="請輸入整數。", color=0xf21c1c)
                     embed.set_footer(text=time_stamp)
                     final_msg.append(embed)
                     final_msg_type.append("embed")
+                    channel.append(message.channel)
             elif mode == "busy-3":
                 if msg_in == "y" or "Y":
                     music = discord.Activity(type=discord.ActivityType.playing, name="Alpha測試階段")
@@ -153,6 +166,7 @@ async def on_message(message):
                     embed.set_footer(text=time_stamp)
                     final_msg.append(embed)
                     final_msg_type.append("embed")
+                    channel.append(message.channel)
                     order_info = order_notifer.new_order_notice(current_order["order_num"])
                     mode = "ready"
                     current_order = {}
@@ -162,6 +176,7 @@ async def on_message(message):
                     embed.set_footer(text=time_stamp)
                     final_msg.append(embed)
                     final_msg_type.append("embed")
+                    channel.append(message.channel)
                 else:
                     try:
                         order_txt_path = base_dir + "\\order-database\\" + msg_in + ".txt"
@@ -178,27 +193,27 @@ async def on_message(message):
                             embed.set_footer(text=time_stamp)
                         final_msg.append(embed)
                         final_msg_type.append("embed")
+                        channel.append(message.channel)
                     except FileNotFoundError:
                         embed = discord.Embed(title="錯誤：查詢訂單", description="訂單編號{0}不存在！".format(msg_in), color=0xf21c1c)
                         embed.set_footer(text=time_stamp)
     if order_info != "":
-        channel = client.get_channel(942379971345797151)
         final_msg.append("<@657519721138094080>")
         final_msg_type.append("normal")
+        channel.append(client.get_channel(942379971345797151))
         final_msg.append(order_info)
         final_msg_type.append("embed")
+        channel.append(message.channel)
         order_info = ""
     for i in range(len(final_msg)):
-        if channel == "":
-            channel = message.channel
         if final_msg_type[i] == "embed":
-            await channel.send(embed=final_msg[i])
+            await channel[i].send(embed=final_msg[i])
         else:
-            await channel.send(final_msg[i])
-        new_log = str(message.channel) + "/" + str(client.user) + ":\n" + str(final_msg[i]) + "\n\n"
+            await channel[i].send(final_msg[i])
+        new_log = str(channel[i]) + "/" + str(client.user) + ":\n" + str(final_msg[i]) + "\n\n"
         log_writter.write_log(new_log)
     final_msg = []
-    channel = ""
+    channel = []
     final_msg_type = []
 
 env_path = "TOKEN.env"
