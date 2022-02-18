@@ -9,7 +9,6 @@ import order_notifer
 client = discord.Client()
 localtime = time.localtime()
 final_msg = []
-time_stamp = time.strftime("%Y/%m/%d  %p  %I:%M:%S", localtime)
 base_dir = os.path.abspath(os.path.dirname(__file__))
 mode = "ready"
 current_order = {}
@@ -29,8 +28,9 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    global final_msg, final_msg_type, time_stamp, mode, current_order, order_info, channel
+    global final_msg, final_msg_type, localtime, mode, current_order, order_info, channel
     msg_in = str(message.content)
+    time_stamp = time.strftime("%Y/%m/%d  %p  %I:%M:%S", localtime)
     if message.author == client.user:
         return
     elif msg_in.startswith("ao!"):
