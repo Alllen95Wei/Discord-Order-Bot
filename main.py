@@ -15,6 +15,7 @@ current_order = {}
 order_info = ""
 final_msg_type = []
 channel = []
+testing = False
 
 
 @client.event
@@ -28,10 +29,27 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    global final_msg, final_msg_type, localtime, mode, current_order, order_info, channel
+    global final_msg, final_msg_type, localtime, mode, current_order, order_info, channel, testing
     msg_in = str(message.content)
     time_stamp = time.strftime("%Y/%m/%d  %p  %I:%M:%S", localtime)
     if message.author == client.user:
+        return
+    elif msg_in == "ao!test":
+        if testing:
+            testing = False
+            embed = discord.Embed(title="測試結束", description="測試模式已關閉。", color=0xF2E011)
+            embed.set_footer(text=time_stamp)
+            final_msg.append(embed)
+            final_msg_type.append("embed")
+            channel.append(message.channel)
+        else:
+            testing = True
+            embed = discord.Embed(title="測試開始", description="測試模式已開啟。", color=0xF2E011)
+            embed.set_footer(text=time_stamp)
+            final_msg.append(embed)
+            final_msg_type.append("embed")
+            channel.append(message.channel)
+    elif testing:
         return
     elif msg_in.startswith("ao!"):
         use_log = str(message.channel) + "/" + str(message.author) + ":\n" + msg_in + "\n\n"
@@ -46,14 +64,14 @@ async def on_message(message):
             final_msg.append(embed)
             final_msg_type.append("embed")
             channel.append(message.channel)
-        if msg_in[3:] == "ping":
+        elif msg_in[3:] == "ping":
             embed = discord.Embed(title="延遲", description="{0}ms".format(str(round(client.latency * 1000))),
                                   color=0x14E073)
             embed.set_footer(text=time_stamp)
             final_msg.append(embed)
             final_msg_type.append("embed")
             channel.append(message.channel)
-        if msg_in[3:6] == "add":
+        elif msg_in[3:6] == "add":
             if "busy" not in mode:
                 current_order["author"] = str(message.author)
                 mode = "busy-1"
@@ -80,7 +98,7 @@ async def on_message(message):
                 final_msg.append(embed)
                 final_msg_type.append("embed")
                 channel.append(message.channel)
-        if msg_in[3:7] == "edit":
+        elif msg_in[3:7] == "edit":
             if "busy" not in mode:
                 current_order["author"] = str(message.author)
                 mode = "busy-e-1"
