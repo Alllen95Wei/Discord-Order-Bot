@@ -218,14 +218,25 @@ async def on_message(message):
                             embed = discord.Embed(title="選擇編輯欄位", description="請輸入要編輯的**欄位編號**。", color=0x14E073)
                             embed.set_footer(text="輸入n以取消 • " + time_stamp)
                             mode = "busy-e-2"
+                            final_msg.append(embed)
+                            final_msg_type.append("embed")
+                            channel.append(message.channel)
                         else:
                             embed = discord.Embed(title="錯誤：編輯訂單", description="訂單編號：`{0}`，並非您的訂單。".format(str(msg_in)),
                                                   color=0xf21c1c)
                             embed.set_footer(text="輸入n以取消 • " + time_stamp)
-                            # problem here
-                        final_msg.append(embed)
-                        final_msg_type.append("embed")
-                        channel.append(message.channel)
+                            final_msg.append(embed)
+                            final_msg_type.append("embed")
+                            channel.append(message.channel)
+                            embed = discord.Embed(title="自動取消", description="由於未知的bug，系統已自動取消此指令。", color=0x14E073)
+                            embed.set_footer(text=time_stamp)
+                            final_msg.append(embed)
+                            final_msg_type.append("embed")
+                            channel.append(message.channel)
+                            mode = "ready"
+                            current_order = {}
+                            music = discord.Activity(type=discord.ActivityType.playing, name="Beta測試階段")
+                            await client.change_presence(status=discord.Status.online, activity=music)
                     except FileNotFoundError:
                         embed = discord.Embed(title="錯誤：編輯訂單", description="訂單編號`{0}`不存在！".format(msg_in),
                                               color=0xf21c1c)
