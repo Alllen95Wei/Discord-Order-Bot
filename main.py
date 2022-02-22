@@ -7,7 +7,6 @@ import log_writter
 import order_notifer
 
 client = discord.Client()
-localtime = time.localtime()
 final_msg = []
 base_dir = os.path.abspath(os.path.dirname(__file__))
 mode = "ready"
@@ -29,8 +28,9 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    global final_msg, final_msg_type, localtime, mode, current_order, order_info, channel, testing
+    global final_msg, final_msg_type, mode, current_order, order_info, channel, testing
     msg_in = str(message.content)
+    localtime = time.localtime()
     time_stamp = time.strftime("%Y/%m/%d  %p  %I:%M:%S", localtime)
     if message.author == client.user:
         return
@@ -49,6 +49,8 @@ async def on_message(message):
             final_msg.append(embed)
             final_msg_type.append("embed")
             channel.append(message.channel)
+        use_log = str(message.channel) + "/" + str(message.author) + ":\n" + msg_in + "\n\n"
+        log_writter.write_log(use_log)
     elif testing:
         return
     elif msg_in.startswith("ao!"):
@@ -56,10 +58,10 @@ async def on_message(message):
         log_writter.write_log(use_log)
         if msg_in[3:] == "help":
             embed = discord.Embed(title="協助", description="本機器人正在開發中，敬請期待！", color=0x14E073)
-            embed.add_field(name="`help`", value="顯示此協助訊息。")
-            embed.add_field(name="`ping`", value="檢查本機器人延遲狀態。")
-            embed.add_field(name="`add`", value="新增訂單。")
-            embed.add_field(name="`edit`", value="編輯訂單。")
+            embed.add_field(name="`help`", value="顯示此協助訊息。", inline=True)
+            embed.add_field(name="`ping`", value="檢查本機器人延遲狀態。", inline=True)
+            embed.add_field(name="`add`", value="新增訂單。", inline=True)
+            embed.add_field(name="`edit`", value="編輯訂單。", inline=True)
             embed.set_footer(text=time_stamp)
             final_msg.append(embed)
             final_msg_type.append("embed")
@@ -220,6 +222,7 @@ async def on_message(message):
                             embed = discord.Embed(title="錯誤：編輯訂單", description="訂單編號：`{0}`，並非您的訂單。".format(str(msg_in)),
                                                   color=0xf21c1c)
                             embed.set_footer(text="輸入n以取消 • " + time_stamp)
+                            # problem here
                         final_msg.append(embed)
                         final_msg_type.append("embed")
                         channel.append(message.channel)
